@@ -1,6 +1,13 @@
 import { Link } from "react-router-dom";
 import "../componentSpecificStyles/landingPageStyles.css";
 import { useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+	LandingPageButtonTransitionVariants,
+	LandingPageTextTransitionVariants,
+	LandingPageTitleTransitionVariants,
+} from "../framerMotionVariants/landingPageVariants";
+import { RouteTransitionVariants } from "../framerMotionVariants/generalVariants";
 
 export default function LandingPageComponent() {
 	useEffect(() => {
@@ -18,8 +25,15 @@ export default function LandingPageComponent() {
 	});
 	return (
 		<>
-			<div className="text-white flex flex-col items-center z-10">
-				<h1
+			<motion.div
+				className="text-white flex flex-col items-center z-10"
+				variants={RouteTransitionVariants}
+				initial="initial"
+				animate="animate"
+				exit="exit"
+			>
+				<motion.h1
+					variants={LandingPageTitleTransitionVariants}
 					className="text-9xl landing-page-title-text mt-20 mb-20 mob:text-7xl"
 					style={{ fontFamily: "Poiret One" }}
 				>
@@ -30,19 +44,26 @@ export default function LandingPageComponent() {
 					<span>e</span>
 					<span>c</span>
 					<span>t</span>
-				</h1>
+				</motion.h1>
 				<div className="align-text-bottom flex flex-col justify-center h-32 mob:text-center">
-					<p className="text-white text-4xl" style={{ fontFamily: "Raleway" }}>
+					<motion.p
+						variants={LandingPageTextTransitionVariants}
+						className="text-white text-4xl"
+						style={{ fontFamily: "Raleway" }}
+					>
 						Let's{" "}
 						<Link className="text-white pb-4" to="/dashboard">
-							<button className="landing-page-dashboard-button uppercase relative border-b-2 px-2 py-2 hover:text-black hover:text-5xl transition-all mob:bg-white mob:text-black hover:font-extrabold">
+							<motion.button
+								variants={LandingPageButtonTransitionVariants}
+								className="landing-page-dashboard-button uppercase relative border-b-2 px-2 py-2 hover:text-black hover:text-5xl transition-all mob:bg-white mob:text-black hover:font-extrabold"
+							>
 								<span className="">hop in</span>
-							</button>
+							</motion.button>
 						</Link>{" "}
 						and connect!
-					</p>
+					</motion.p>
 				</div>
-			</div>
+			</motion.div>
 		</>
 	);
 }
