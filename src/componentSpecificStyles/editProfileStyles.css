@@ -7,7 +7,7 @@
 }
 
 .edit-profile-main form label {
-	@apply text-3xl;
+	@apply text-4xl;
 }
 
 .edit-profile-main form input {
@@ -15,11 +15,11 @@
 }
 
 .forms-container form label {
-	@apply mb-2 mt-4;
+	@apply mb-1 mt-8;
 }
 
 .forms-container form input {
-	@apply bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4 text-2xl mb-2;
+	@apply bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 text-2xl mb-2;
 }
 
 .forms-container form button {
