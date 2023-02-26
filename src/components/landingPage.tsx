@@ -4,14 +4,14 @@ import { useEffect } from "react";
 
 export default function LandingPageComponent() {
 	useEffect(() => {
-		document.body.style.overflow = "hidden"; // Prevents scrolling on the landing page, caused by the SVGs being off screen
+		document.body.style.overflow = "hidden";
 		let rootHtml = document.querySelector("html");
-		rootHtml!.style.overflow = "hidden"; // Prevents scrolling on the landing page, caused by the SVGs being off screen
+		rootHtml!.style.overflow = "hidden";
 		rootHtml!.style.position = "fixed";
 		rootHtml!.style.width = "100vw";
 		return () => {
-			document.body.style.overflow = "unset"; // Resets overflow property to allow scrolling once the user leaves the landing page\
-			rootHtml!.style.overflow = "unset"; // Resets overflow property to allow scrolling once the user leaves the landing page
+			document.body.style.overflow = "unset";
+			rootHtml!.style.overflow = "unset";
 			rootHtml!.style.position = "unset";
 			rootHtml!.style.width = "unset";
 		};
