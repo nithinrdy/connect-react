@@ -11,7 +11,7 @@ const RouteTransitionVariants = {
 			duration: 0.3,
 			ease: "easeOut",
 			delayChildren: 0.5,
-			staggerChildren: 0.2,
+			staggerChildren: 0.1,
 		},
 	},
 	exit: {
