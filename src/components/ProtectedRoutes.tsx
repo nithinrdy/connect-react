@@ -31,7 +31,7 @@ export default function ProtectedRoutes() {
 				.catch((err) => {
 					setTimeout(() => setLoading(false), 500);
 					console.log(err);
-					navigateTo("/", { state: { from: location }, replace: true });
+					navigateTo("/login", { state: { from: location }, replace: true });
 				});
 		}
 	}, [decodedToken, currentTime, refreshToken, navigateTo, location]);
