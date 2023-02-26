@@ -1,11 +1,11 @@
 const RouteTransitionVariants = {
 	initial: {
 		opacity: 0,
-		scale: 0.5,
+		y: 100,
 	},
 	animate: {
 		opacity: 1,
-		scale: 1,
+		y: 0,
 		transition: {
 			type: "linear",
 			duration: 0.3,
@@ -16,7 +16,7 @@ const RouteTransitionVariants = {
 	},
 	exit: {
 		opacity: 0,
-		scale: 2.5,
+		y: -100,
 		transition: {
 			delayChildren: 0.1,
 			staggerChildren: 0.1,

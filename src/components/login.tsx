@@ -2,7 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useAuth from "../customHooksAndServices/authContextHook";
 import useLogin from "../customHooksAndServices/loginHook";
-import { FaArrowLeft } from "react-icons/fa";
+import { motion } from "framer-motion";
+import { FaHome } from "react-icons/fa";
+import { RouteTransitionVariants } from "../framerMotionVariants/generalVariants";
+import "../componentSpecificStyles/loginPageStyles.css";
 
 const EMAIL_REGEX = /^[A-z0-9._%+-]+@[A-z0-9.-]+\.[A-z]{2,4}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{7,15}$/;
@@ -51,18 +54,35 @@ export default function LoginComponent() {
 
 	return (
 		<>
-			<Link to="/" className="">
-				<FaArrowLeft className="" />
-				<span className="">Back to the Landing Page</span>
-			</Link>
-			<main className="">
-				<div className="">
-					<div className="">
-						<h1 className="">LOGIN</h1>
-						<form className="" onSubmit={handleLogin}>
+			<motion.div
+				className="text-white"
+				variants={RouteTransitionVariants}
+				initial="initial"
+				animate="animate"
+				exit="exit"
+			>
+				<Link to="/" className="top-7 left-8">
+					<button className="home-button relative px-2 py-2 transition-all group">
+						<FaHome className="h-10 w-10 group-hover:fill-black transition-colors" />
+					</button>
+				</Link>
+				<main className="flex flex-col items-center">
+					<div className="flex flex-col items-center w-full">
+						<h1
+							className="text-4xl font-bold mb-8"
+							style={{ fontFamily: "Poiret One" }}
+						>
+							LOGIN
+						</h1>
+						<form
+							className="flex flex-col items-center text-2xl"
+							style={{ fontFamily: "Raleway" }}
+							onSubmit={handleLogin}
+						>
 							<label htmlFor="login-email">Email</label>
 							<input
-								type=""
+								className="bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4 mb-8"
+								type="email"
 								name="email"
 								id="login-email"
 								value={loginEmail}
@@ -71,23 +91,32 @@ export default function LoginComponent() {
 							/>
 							<label htmlFor="login-password">Password</label>
 							<input
-								type=""
+								className="bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4 mb-8"
+								type="password"
 								name="password"
 								id="login-password"
 								value={loginPassword}
 								onChange={(e) => setLoginPassword(e.target.value)}
 								required
 							/>
-							<button type="submit" className="" disabled={requestInProgress}>
+							<button
+								type="submit"
+								className="border-b-2 px-2 py-2 relative login-button transition-colors mb-8 hover:text-black mob:bg-white mob:text-black"
+								disabled={requestInProgress}
+							>
 								Login
 							</button>
-							<Link to="/register" className="">
-								Don't have an account yet? Register
+							Don't have an account yet?
+							<Link
+								to="/register"
+								className="mt-2 relative register-button px-2 py-2 transition-colors hover:text-black mob:border-b-2"
+							>
+								<button>Register</button>
 							</Link>
 						</form>
 					</div>
-				</div>
-			</main>
+				</main>
+			</motion.div>
 		</>
 	);
 }

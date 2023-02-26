@@ -57,7 +57,7 @@ export default function LandingPageComponent() {
 								variants={LandingPageButtonTransitionVariants}
 								className="landing-page-dashboard-button uppercase relative border-b-2 px-2 py-2 hover:text-black hover:text-5xl transition-all mob:bg-white mob:text-black hover:font-extrabold"
 							>
-								<span className="">hop in</span>
+								hop in
 							</motion.button>
 						</Link>{" "}
 						and connect!
