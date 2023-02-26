@@ -1,3 +1,70 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+	@apply bg-gradient-to-bl from-black to-gray-800 min-h-screen;
+}
+
+@keyframes heavyFloat {
+	0% {
+		transform: translate(0, 0) scale(1.5) rotate(0deg);
+	}
+	50% {
+		transform: translate(0, 30px) scale(1.5) rotate(30deg);
+	}
+	100% {
+		transform: translate(0, 0) scale(1.5) rotate(0deg);
+	}
+}
+
+@keyframes lightFloat {
+	0% {
+		transform: translate(0, 0) rotate(70deg);
+	}
+	50% {
+		transform: translate(0, 20px) rotate(110deg);
+	}
+	100% {
+		transform: translate(0, 0) rotate(70deg);
+	}
+}
+
+.ornaments {
+	margin-left: 30%;
+}
+
+.ornaments .ornament {
+	@apply fixed -z-10;
+}
+
+.ornaments .ornament .circle {
+	@apply h-20 w-20 rounded-full bg-gradient-to-tr from-gray-900 to-gray-500;
+}
+
+.ornaments .ornament .circle.circle-1 {
+	animation: heavyFloat 5s ease-in-out infinite;
+}
+
+.ornaments .ornament .circle.circle-2 {
+	animation: lightFloat 3s ease-in-out infinite;
+}
+
+.ornaments .ornament .triangle {
+	@apply h-0 w-0 bg-transparent;
+	border-left: 30px solid transparent;
+	border-right: 30px solid transparent;
+	border-bottom: 50px solid #374151;
+}
+
+.ornaments .ornament .triangle.triangle-1 {
+	animation: heavyFloat 7s ease-in-out infinite;
+}
+
+.ornaments .ornament .triangle.triangle-2 {
+	animation: lightFloat 4s ease-in-out infinite;
+}
+
+.ornaments .ornament .triangle.triangle-3 {
+	animation: lightFloat 10s ease-in-out infinite;
+}

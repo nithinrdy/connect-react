@@ -18,17 +18,16 @@ export default function LandingPageComponent() {
 	});
 	return (
 		<>
-			<div className="">
+			<div className="text-white">
 				<h1 className="">Connect</h1>
-				<p className="">Let's hop on and connect!</p>
-				<div className="">
-					<Link to="/login">
-						<button className="">Login</button>
-					</Link>
-					<Link to="/register">
-						<button className="">Register</button>
-					</Link>
-				</div>
+				<p className="">
+					Let's{" "}
+					<Link to="/dashboard">
+						<button>hop on</button>
+					</Link>{" "}
+					and connect!
+				</p>
+				<div className=""></div>
 			</div>
 		</>
 	);
