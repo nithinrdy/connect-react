@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.side-menu {
+	@apply min-h-screen h-full w-64 mob:w-4/5 text-white fixed top-0 left-0 z-10 duration-500 ease-out;
+	@apply bg-gray-800 shadow-xl shadow-black;
+	transform: translateX(-240%);
+}
+
+.side-menu.side-menu-active {
+	@apply translate-x-0;
+}
+
+.side-menu a {
+	@apply w-full mob:w-4/5;
+}
+
+.side-menu button {
+	@apply border-white relative border-t-2 text-white text-2xl mob:text-2xl p-3 transition-colors w-full;
+}
+
+.side-menu button:hover {
+	@apply text-black;
+}
+
+.side-menu button:after {
+	content: "";
+	position: absolute;
+	bottom: 100%;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: white;
+	z-index: -1;
+	transform-origin: bottom;
+	transform: scaleY(0);
+	transition: transform 0.2s ease;
+}
+
+.side-menu button:hover:after {
+	transform: scaleY(-1);
+}

@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.hamburger-icon {
+	@apply w-9 h-10 fixed cursor-pointer duration-500 z-20;
+}
+
+.hamburger-icon.menu-active {
+	@apply wide:ml-28 mob:scale-150 mob:mt-12;
+}
+
+@media (max-width: 768px) {
+	.hamburger-icon.menu-active {
+		margin-left: 38%;
+	}
+}
+
+.hamburger-icon span {
+	@apply block absolute h-1 w-full bg-white duration-300 origin-right rounded;
+}
+
+.hamburger-icon .bar-1 {
+	@apply top-0;
+}
+
+.hamburger-icon.menu-active .bar-1 {
+	@apply w-3/4 bg-white;
+	transform: rotate(-30deg);
+	top: -2px;
+}
+
+.hamburger-icon .bar-2 {
+	@apply top-3;
+}
+
+.hamburger-icon.menu-active .bar-2 {
+	@apply w-0 opacity-0;
+}
+
+.hamburger-icon .bar-3 {
+	@apply top-6;
+}
+
+.hamburger-icon.menu-active .bar-3 {
+	@apply w-3/4 bg-white;
+	transform: rotate(30deg);
+	top: 24px;
+}
+
+@media (max-width: 768px) {
+	.hamburger-icon.menu-active .bar-3 {
+		top: 25px;
+	}
+}
