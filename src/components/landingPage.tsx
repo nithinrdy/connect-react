@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "../index.css";
+import "../componentSpecificStyles/landingPageStyles.css";
 import { useEffect } from "react";
 
 export default function LandingPageComponent() {
@@ -18,16 +18,30 @@ export default function LandingPageComponent() {
 	});
 	return (
 		<>
-			<div className="text-white">
-				<h1 className="">Connect</h1>
-				<p className="">
-					Let's{" "}
-					<Link to="/dashboard">
-						<button>hop on</button>
-					</Link>{" "}
-					and connect!
-				</p>
-				<div className=""></div>
+			<div className="text-white flex flex-col items-center z-10">
+				<h1
+					className="text-9xl landing-page-title-text mt-20 mb-20 mob:text-7xl"
+					style={{ fontFamily: "Poiret One" }}
+				>
+					<span>C</span>
+					<span>o</span>
+					<span>n</span>
+					<span>n</span>
+					<span>e</span>
+					<span>c</span>
+					<span>t</span>
+				</h1>
+				<div className="align-text-bottom flex flex-col justify-center h-32 mob:text-center">
+					<p className="text-white text-4xl" style={{ fontFamily: "Raleway" }}>
+						Let's{" "}
+						<Link className="text-white pb-4" to="/dashboard">
+							<button className="landing-page-dashboard-button uppercase relative border-b-2 px-2 py-2 hover:text-black hover:text-5xl transition-all mob:bg-white mob:text-black hover:font-extrabold">
+								<span className="">hop in</span>
+							</button>
+						</Link>{" "}
+						and connect!
+					</p>
+				</div>
 			</div>
 		</>
 	);

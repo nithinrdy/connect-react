@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.landing-page-title-text span {
+	cursor: default;
+	-webkit-text-stroke: 1px white;
+	-webkit-text-fill-color: transparent;
+	@apply inline-block transition-transform;
+}
+
+.landing-page-title-text span:hover {
+	@apply -translate-y-3;
+}
+
+.landing-page-dashboard-button:after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: white;
+	z-index: -1;
+	transform-origin: bottom;
+	transform: scaleY(0);
+	transition: transform 0.2s ease;
+}
+
+.landing-page-dashboard-button:hover:after {
+	transform: scaleY(1);
+}

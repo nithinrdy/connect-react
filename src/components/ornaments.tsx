@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
-import "../index.css";
+import "../componentSpecificStyles/ornamentStyles.css";
 
 export default function OrnamentsComponent() {
 	return (
 		<>
-			<div className="ornaments mt-60 fixed">
+			<div className="ornaments mt-60 fixed pointer-events-none">
 				<div className="ornament">
 					<div className="triangle triangle-1 -mt-20 rotate-90"></div>
 				</div>
