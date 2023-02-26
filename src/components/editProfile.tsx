@@ -7,6 +7,12 @@ import {
 import useAuth from "../customHooksAndServices/authContextHook";
 import useEditProfile from "../customHooksAndServices/editProfileHook";
 import { FaCheck } from "react-icons/fa";
+import { motion } from "framer-motion";
+import {
+	ConstituentPageElementsVariants,
+	RouteTransitionVariants,
+} from "../framerMotionVariants/generalVariants";
+import "../componentSpecificStyles/editProfileStyles.css";
 
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{7,15}$/;
 const EMAIL_REGEX = /^[A-z0-9._%+-]+@[A-z0-9.-]+\.[A-z]{2,4}$/;
@@ -146,114 +152,141 @@ export default function EditProfile() {
 
 	return (
 		<>
-			<main className="">
-				<div className="">
-					<div className="">
-						<h1 className="">Edit your profile</h1>
-						<form className="" onSubmit={handleEmailUpdate}>
-							<div className="">
-								<label>Email</label>
-								<div className="">
-									<input
-										type="email"
-										value={editEmail}
-										onChange={(e) => setEditEmail(e.target.value)}
-										placeholder="Enter a new email"
-									/>
-									<div className="">
-										<button
-											type="submit"
-											disabled={
-												requestInProgress ||
-												errorState.editEmail ||
-												!editEmail ||
-												displayEmailChangeSuccess
-											}
-										>
-											Update
-										</button>
-
-										<FaCheck
-											className={`change-success-check-mark ${
-												displayEmailChangeSuccess ? "show-check" : ""
-											}`}
-										/>
-									</div>
-								</div>
+			<motion.main
+				className="flex flex-col items-center text-white edit-profile-main"
+				variants={RouteTransitionVariants}
+				initial="initial"
+				animate="animate"
+				exit="exit"
+			>
+				<div className="flex flex-col forms-container items-center w-full mt-12 mb-12">
+					<h1
+						className="text-7xl mb-8 text-center"
+						style={{ fontFamily: "Poiret One" }}
+					>
+						Edit your profile
+					</h1>
+					<motion.form
+						variants={ConstituentPageElementsVariants}
+						className="flex flex-col items-center w-full"
+						style={{ fontFamily: "Raleway" }}
+						onSubmit={handleEmailUpdate}
+					>
+						<div className="flex flex-col items-start w-full">
+							<label>Email</label>
+							<div className="w-full">
+								<input
+									type="email"
+									value={editEmail}
+									onChange={(e) => setEditEmail(e.target.value)}
+									placeholder="Enter a new email"
+								/>
 								{errorState.editEmail && (
-									<p className="">Please enter a valid email address.</p>
+									<p className="text-center">
+										Please enter a valid email address.
+									</p>
 								)}
-							</div>
-						</form>
-						<form className="" onSubmit={handlePasswordUpdate}>
-							<div className="">
-								<label>Password</label>
-								<div className="">
-									<input
-										className=""
-										type="password"
-										value={editPassword}
-										onChange={(e) => setEditPassword(e.target.value)}
-										placeholder="Enter a new password"
-									/>
-									<div className="">
-										<button
-											type="submit"
-											disabled={
-												requestInProgress ||
-												errorState.editPassword ||
-												!editPassword ||
-												displayPasswordChangeSuccess
-											}
-										>
-											Update
-										</button>
-										<FaCheck
-											className={`change-success-check-mark ${
-												displayPasswordChangeSuccess ? "show-check" : ""
-											}`}
-										/>
-									</div>
-								</div>
-								{errorState.editPassword && (
-									<p className="">Please enter a valid password.</p>
-								)}
-							</div>
-						</form>
+								<div className="flex items-center">
+									<button
+										type="submit"
+										disabled={
+											requestInProgress ||
+											errorState.editEmail ||
+											!editEmail ||
+											displayEmailChangeSuccess
+										}
+									>
+										Update
+									</button>
 
-						<form className="" onSubmit={handleNicknameUpdate}>
-							<div className="">
-								<label>Nickname</label>
-								<div className="">
-									<input
-										type="text"
-										value={editNickname}
-										onChange={(e) => setEditNickname(e.target.value)}
-										placeholder="Enter a new nickname"
+									<FaCheck
+										className={`change-success-check-mark ${
+											displayEmailChangeSuccess ? "show-check" : ""
+										}`}
 									/>
-									<div className="">
-										<button
-											type="submit"
-											disabled={
-												requestInProgress ||
-												!editNickname ||
-												displayNicknameChangeSuccess
-											}
-										>
-											Update
-										</button>
-										<FaCheck
-											className={`change-success-check-mark ${
-												displayNicknameChangeSuccess ? "show-check" : ""
-											}`}
-										/>
-									</div>
 								</div>
 							</div>
-						</form>
-					</div>
+						</div>
+					</motion.form>
+					<motion.form
+						variants={ConstituentPageElementsVariants}
+						className="flex flex-col items-center w-full"
+						style={{ fontFamily: "Raleway" }}
+						onSubmit={handlePasswordUpdate}
+					>
+						<div className="flex flex-col items-start w-full">
+							<label>Password</label>
+							<div className="w-full">
+								<input
+									type="password"
+									value={editPassword}
+									onChange={(e) => setEditPassword(e.target.value)}
+									placeholder="Enter a new password"
+								/>
+								{errorState.editPassword && (
+									<p className="text-center">
+										Password must contain a number, a capital letter, a small
+										letter and must be 7 to 15 characters long.
+									</p>
+								)}
+								<div className="flex items-center">
+									<button
+										type="submit"
+										disabled={
+											requestInProgress ||
+											errorState.editPassword ||
+											!editPassword ||
+											displayPasswordChangeSuccess
+										}
+									>
+										Update
+									</button>
+									<FaCheck
+										className={`change-success-check-mark ${
+											displayPasswordChangeSuccess ? "show-check" : ""
+										}`}
+									/>
+								</div>
+							</div>
+						</div>
+					</motion.form>
+					<motion.form
+						variants={ConstituentPageElementsVariants}
+						className="flex flex-col items-center w-full"
+						style={{ fontFamily: "Raleway" }}
+						onSubmit={handleNicknameUpdate}
+					>
+						<div className="flex flex-col items-start w-full">
+							<label>Nickname</label>
+							<div className="w-full">
+								<input
+									type="text"
+									value={editNickname}
+									onChange={(e) => setEditNickname(e.target.value)}
+									placeholder="Enter a new nickname"
+								/>
+								<div className="flex items-center">
+									<button
+										type="submit"
+										disabled={
+											requestInProgress ||
+											!editNickname ||
+											displayNicknameChangeSuccess
+										}
+									>
+										Update
+									</button>
+									<FaCheck
+										className={`change-success-check-mark ${
+											displayNicknameChangeSuccess ? "show-check" : ""
+										}`}
+									/>
+								</div>
+							</div>
+						</div>
+					</motion.form>
 				</div>
-			</main>
+			</motion.main>
 		</>
 	);
 }

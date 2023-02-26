@@ -126,7 +126,7 @@ export default function LoginComponent() {
 								}`}
 							>
 								Password must contain a number, a capital letter, a small letter
-								and must be 7 to 15 characters long
+								and must be 7 to 15 characters long.
 							</p>
 							<motion.button
 								variants={LoginAndRegisterPageElementVariants}
