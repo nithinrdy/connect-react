@@ -62,13 +62,13 @@ export default function LoginComponent() {
 				animate="animate"
 				exit="exit"
 			>
-				<Link to="/" className="top-7 left-8">
+				<Link to="/" className="top-7 left-8 fixed">
 					<button className="home-button relative px-2 py-2 transition-all group">
 						<FaHome className="h-10 w-10 group-hover:fill-black transition-colors" />
 					</button>
 				</Link>
 				<main className="flex flex-col items-center">
-					<div className="flex flex-col items-center w-full">
+					<div className="flex flex-col items-center w-full mt-12">
 						<motion.h1
 							variants={LoginAndRegisterPageElementVariants}
 							className="text-4xl font-bold mb-8"
@@ -126,12 +126,12 @@ export default function LoginComponent() {
 								}`}
 							>
 								Password must contain a number, a capital letter, a small letter
-								and must be between 7 and 15 characters long
+								and must be 7 to 15 characters long
 							</p>
 							<motion.button
 								variants={LoginAndRegisterPageElementVariants}
 								type="submit"
-								className="border-b-2 px-2 py-2 relative login-button transition-colors mb-8 hover:text-black mob:bg-white mob:text-black"
+								className="border-b-2 px-2 py-2 relative login-page-login-button transition-colors mb-8 hover:text-black mob:bg-white mob:text-black"
 								disabled={
 									requestInProgress || loginEmailError || loginPasswordError
 								}
@@ -143,7 +143,7 @@ export default function LoginComponent() {
 							</motion.p>
 							<Link
 								to="/register"
-								className="mt-2 relative register-button px-2 py-2 transition-colors hover:text-black mob:border-b-2"
+								className="mt-2 mb-8 relative login-page-register-button px-2 py-2 transition-colors hover:text-black mob:border-b-2"
 							>
 								<motion.button variants={LoginAndRegisterPageElementVariants}>
 									Register

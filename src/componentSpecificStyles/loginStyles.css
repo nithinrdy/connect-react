@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .home-button:after,
-.login-button:after {
+.login-page-login-button:after {
 	content: "";
 	position: absolute;
 	top: 0;
@@ -18,11 +18,11 @@
 }
 
 .home-button:hover:after,
-.login-button:hover:after {
+.login-page-login-button:hover:after {
 	transform: scaleY(1);
 }
 
-.register-button:after {
+.login-page-register-button:after {
 	content: "";
 	position: absolute;
 	bottom: 100%;
@@ -36,14 +36,14 @@
 	transition: transform 0.2s ease;
 }
 
-.register-button:hover:after {
+.login-page-register-button:hover:after {
 	transform: scaleY(-1);
 }
 
-.login-button[disabled] {
+.login-page-login-button[disabled] {
 	@apply cursor-not-allowed pointer-events-none text-gray-500;
 }
 
-.login-button[disabled]:after {
+.login-page-login-button[disabled]:after {
 	@apply scale-y-0;
 }
