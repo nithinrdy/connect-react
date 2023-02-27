@@ -41,7 +41,7 @@
 }
 
 .register-page-register-button[disabled] {
-	@apply cursor-not-allowed pointer-events-none text-gray-500;
+	@apply cursor-not-allowed pointer-events-none text-gray-500 border-gray-600;
 }
 
 .register-page-register-button[disabled]:after {

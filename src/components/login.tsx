@@ -43,7 +43,6 @@ export default function LoginComponent() {
 			return;
 		}
 		const data = await login({ email: loginEmail, password: loginPassword });
-		console.log(data.data.user);
 		setRequestInProgress(false);
 		if (data.status === 200) {
 			setUser(data.data.user);
