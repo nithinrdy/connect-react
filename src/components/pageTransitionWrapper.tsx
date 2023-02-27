@@ -8,6 +8,7 @@ import DashboardComponent from "./dashboard";
 import LandingPageComponent from "./landingPage";
 import EditProfile from "./editProfile";
 import SideMenuWrapper from "./sideMenuWrapper";
+import ConnectPage from "./connectPage";
 
 const PageTransitionWrapper = () => {
 	const location = useLocation();
@@ -18,6 +19,7 @@ const PageTransitionWrapper = () => {
 				<Route element={<ProtectedRoutes />}>
 					<Route element={<SideMenuWrapper />}>
 						<Route path="/dashboard" element={<DashboardComponent />} />
+						<Route path="/connect" element={<ConnectPage />} />
 						<Route path="/edit-profile" element={<EditProfile />} />
 					</Route>
 				</Route>
