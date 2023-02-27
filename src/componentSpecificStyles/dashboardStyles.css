@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.dashboard-connect-button:after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: white;
+	z-index: -1;
+	transform-origin: bottom;
+	transform: scaleY(0);
+	transition: transform 0.2s ease;
+}
+
+.dashboard-connect-button:hover:after {
+	transform: scaleY(1);
+}
+
+.dashboard-favorites-button:after {
+	content: "";
+	position: absolute;
+	bottom: 100%;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: white;
+	z-index: -1;
+	transform-origin: bottom;
+	transform: scaleY(0);
+	transition: transform 0.2s ease;
+}
+
+.dashboard-favorites-button:hover:after {
+	transform: scaleY(-1);
+}
