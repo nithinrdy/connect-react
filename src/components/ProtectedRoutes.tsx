@@ -3,6 +3,8 @@ import useAuth from "../customHooksAndServices/authContextHook";
 import jwtDecode from "jwt-decode";
 import useRefreshToken from "../customHooksAndServices/refreshTokenHook";
 import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
+import { useSocket } from "../customHooksAndServices/useSocket";
 
 interface TokenContents {
 	exp: number;
@@ -19,6 +21,22 @@ export default function ProtectedRoutes() {
 	const decodedToken = token ? jwtDecode<TokenContents>(token) : null;
 	const location = useLocation();
 	const currentTime = Date.now() / 1000;
+	const { socket, setSocket, socketConnected, setSocketConnected } =
+		useSocket();
+
+	useEffect(() => {
+		if (!user.username || socketConnected) {
+			return;
+		}
+		setSocket(
+			io("http://localhost:5000", {
+				query: {
+					username: user.username,
+				},
+			})
+		);
+		setSocketConnected(true);
+	}, [socket, setSocket, user.username, socketConnected, setSocketConnected]);
 
 	useEffect(() => {
 		if (decodedToken && decodedToken.exp > currentTime) {

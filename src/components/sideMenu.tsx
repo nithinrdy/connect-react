@@ -4,11 +4,13 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import useAuth from "../customHooksAndServices/authContextHook";
 import { Dispatch, SetStateAction } from "react";
 import { useEffect } from "react";
+import { useSocket } from "../customHooksAndServices/useSocket";
 
 export default function SideMenu(props: {
 	showMenu: boolean;
 	setShowMenu: Dispatch<SetStateAction<boolean>>;
 }) {
+	const { socket, setSocketConnected } = useSocket();
 	const { showMenu, setShowMenu } = props;
 	const { logout } = useLogout();
 	const navigate = useNavigate();
@@ -33,6 +35,8 @@ export default function SideMenu(props: {
 				nickname: "",
 			});
 			navigate("/");
+			socket.disconnect();
+			setSocketConnected(false);
 		});
 	};
 	return (

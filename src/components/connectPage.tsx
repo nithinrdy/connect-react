@@ -5,10 +5,14 @@ import {
 	ConstituentPageElementsVariants,
 } from "../framerMotionVariants/generalVariants";
 import "../componentSpecificStyles/connectStyles.css";
+// import { useSocket } from "../customHooksAndServices/useSocket";
+// import useAuth from "../customHooksAndServices/authContextHook";
 
 const USER_REGEX = /^[A-z0-9-_]{4,20}$/;
 
 export default function ConnectPage() {
+	// const { socket } = useSocket();
+	// const { user } = useAuth();
 	const [username, setUsername] = useState("");
 	const [usernameError, setUsernameError] = useState(false);
 	const [requestInProgress, setRequestInProgress] = useState(false);
@@ -19,13 +23,22 @@ export default function ConnectPage() {
 		} else {
 			setUsernameError(true);
 		}
+		// socket.on("message", (msg) => {
+		// 	console.log(msg);
+		// });
 	}, [username]);
+	// }, [username, socket]);
 
-	const handleStart = () => {
+	const handleStart = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
 		if (usernameError || requestInProgress) {
 			return;
 		}
-		setRequestInProgress(true);
+		// socket.emit("message", {
+		// 	to: "testuser",
+		// 	from: user.username,
+		// 	message: username,
+		// });
 	};
 	return (
 		<motion.div
@@ -40,7 +53,7 @@ export default function ConnectPage() {
 					<form
 						className="flex flex-col items-center text-2xl"
 						style={{ fontFamily: "Raleway" }}
-						onSubmit={handleStart}
+						onSubmit={(e) => handleStart(e)}
 					>
 						<motion.label
 							className="text-4xl"
