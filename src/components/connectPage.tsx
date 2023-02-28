@@ -7,53 +7,68 @@ import {
 import "../componentSpecificStyles/connectStyles.css";
 import useSocket from "../customHooksAndServices/useSocket";
 import useAuth from "../customHooksAndServices/authContextHook";
-import { FaPhone } from "react-icons/fa";
+import { FaPhone, FaTimes, FaVolumeMute } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const USER_REGEX = /^[A-z0-9-_]{4,20}$/;
+
+const servers = {
+	iceServers: [
+		{
+			urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"],
+		},
+	],
+	iceCandidatePoolSize: 10,
+};
+const pc = new RTCPeerConnection(servers);
+let localStream = new MediaStream();
 
 export default function ConnectPage() {
 	const { socket } = useSocket();
 	const { user } = useAuth();
-	const [usernameToCall, setUsername] = useState("");
+	const [usernameToCall, setUsernameToCall] = useState("");
 	const [usernameError, setUsernameError] = useState(false);
 	const [requestInProgress, setRequestInProgress] = useState(false);
+	const [callInProgress, setCallInProgress] = useState(false);
 	const [videoPermission, setVideoPermission] = useState<boolean | null>(null);
-	const [localStream, setLocalStream] = useState<MediaStream>();
 	const [userIsNotOnline, setUserIsNotOnline] = useState(false);
+	const [caller, setCaller] = useState<string | null>(null);
+	const [callReceived, setCallReceived] = useState(false);
+	const [acceptedOnce, setAcceptedOnce] = useState(false);
 
-	const videoRef = React.useRef<HTMLVideoElement>(null);
+	const navigate = useNavigate();
+
+	const localVideoRef = React.useRef<HTMLVideoElement>(null);
+	const remoteVideoRef = React.useRef<HTMLVideoElement>(null);
 
 	useEffect(() => {
 		navigator.mediaDevices
 			.getUserMedia({ video: true, audio: true })
 			.then((stream) => {
-				setLocalStream(stream);
-				videoRef.current!.srcObject = stream;
-				videoRef
+				localStream = stream;
+				localVideoRef.current!.srcObject = stream;
+				localVideoRef
 					.current!.play()
 					.then(() => {
-						videoRef.current!.muted = true;
+						localVideoRef.current!.muted = true;
 					})
 					.catch((err) => {
 						console.log(err);
 					});
 				setVideoPermission(true);
+				stream.getTracks().forEach((track) => {
+					pc.addTrack(track, localStream);
+				});
+				pc.ontrack = (e) => {
+					remoteVideoRef.current!.srcObject = e.streams[0];
+					setCallInProgress(true);
+				};
 			})
 			.catch((err) => {
 				console.log(err);
 				setVideoPermission(false);
 			});
-		socket.on("incomingCall", (data) => {
-			console.log("call", data);
-		});
-		socket.on("callAccepted", (data) => {});
-		socket.on("callRejected", (data) => {});
-		socket.on("notOnline", (data) => {
-			setRequestInProgress(false);
-			setUserIsNotOnline(true);
-			setTimeout(() => setUserIsNotOnline(false), 2500);
-		});
-	}, [socket]);
+	}, []);
 
 	useEffect(() => {
 		if (USER_REGEX.test(usernameToCall) || usernameToCall.length === 0) {
@@ -63,17 +78,149 @@ export default function ConnectPage() {
 		}
 	}, [usernameToCall]);
 
-	const handleStart = (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		if (usernameError || requestInProgress) {
+	useEffect(() => {
+		socket.off("incomingCall");
+		socket.on("incomingCall", (data) => {
+			if (acceptedOnce) {
+				socket.emit("acceptCall", { caller: data.caller });
+				setAcceptedOnce(false);
+				return;
+			}
+			console.log(data);
+			window.confirm("Incoming call from " + data.caller + ". Accept?")
+				? socket.emit("acceptCall", { caller: data.caller }) &&
+				  setAcceptedOnce(true)
+				: socket.emit("rejectCall", { caller: data.caller });
+		});
+		socket.on("incomingOffer", (data) => {
+			const { caller, sdp, type } = data;
+			setCaller(caller);
+			setCallReceived(true);
+			pc.onicecandidate = (e) => {
+				if (e.candidate) {
+					socket.emit("sendCandidate", {
+						to: caller,
+						candidate: e.candidate,
+					});
+				}
+			};
+
+			if (pc.currentRemoteDescription) {
+				return;
+			}
+
+			pc.setRemoteDescription(new RTCSessionDescription({ sdp, type }));
+			pc.createAnswer()
+				.then((answer) => {
+					pc.setLocalDescription(answer);
+					socket.emit("sendAnswer", {
+						to: caller,
+						sdp: answer.sdp,
+						type: answer.type,
+					});
+					socket.on("incomingCandidate", (data) => {
+						if (pc.currentRemoteDescription && pc.currentLocalDescription) {
+							pc.addIceCandidate(new RTCIceCandidate(data));
+						}
+					});
+				})
+				.catch(() => {
+					console.log("createAnswer error");
+				});
+		});
+
+		socket.on("endCall", () => {
+			setCallInProgress(false);
+			pc.close();
+			pc.onicecandidate = null;
+			navigate("/call-ended");
+		});
+	}, [socket, navigate, acceptedOnce]);
+
+	const startCall = () => {
+		pc.onicecandidate = (e) => {
+			if (e && e.candidate) {
+				socket.emit("sendCandidate", {
+					to: usernameToCall,
+					candidate: e.candidate,
+				});
+			}
+		};
+
+		if (pc.currentLocalDescription) {
 			return;
 		}
-		socket.emit("call", {
-			userToCall: usernameToCall,
-			from: user.username,
-			message: "Hello",
+
+		pc.createOffer().then((offer) => {
+			pc.setLocalDescription(offer);
+			socket.emit("sendOffer", {
+				callee: usernameToCall,
+				caller: user.username,
+				sdp: offer.sdp,
+				type: offer.type,
+			});
+			socket.on("incomingAnswer", (data) => {
+				const { sdp, type } = data;
+				if (pc.currentRemoteDescription) {
+					return;
+				}
+				pc.setRemoteDescription(new RTCSessionDescription({ sdp, type }));
+			});
+			socket.on("incomingCandidate", (data) => {
+				if (pc.currentRemoteDescription && pc.currentLocalDescription) {
+					pc.addIceCandidate(new RTCIceCandidate(data));
+				}
+			});
 		});
 	};
+
+	const handleStart = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		if (
+			usernameError ||
+			requestInProgress ||
+			callInProgress ||
+			requestInProgress ||
+			usernameToCall === user.username
+		) {
+			return;
+		}
+		setRequestInProgress(true);
+
+		socket.emit("startCall", {
+			otherEnd: usernameToCall,
+			caller: user.username,
+		});
+		socket.on("callAccepted", () => {
+			startCall();
+			setCallInProgress(true);
+			setRequestInProgress(false);
+		});
+		socket.on("callRejected", () => {
+			setCallInProgress(false);
+			setRequestInProgress(false);
+			window.alert("Call rejected");
+		});
+	};
+
+	const endCall = () => {
+		setCallInProgress(false);
+		pc.close();
+		pc.onicecandidate = null;
+		socket.emit("endOtherEnd", {
+			otherEnd: callReceived ? caller : usernameToCall,
+		});
+		navigate("/call-ended");
+	};
+
+	useEffect(() => {
+		socket.on("notOnline", (data) => {
+			setRequestInProgress(false);
+			setUserIsNotOnline(true);
+			setTimeout(() => setUserIsNotOnline(false), 2500);
+		});
+	}, [socket]);
+
 	return (
 		<motion.div
 			className="text-white"
@@ -83,7 +230,7 @@ export default function ConnectPage() {
 			exit="exit"
 		>
 			<main
-				className="flex flex-col items-center"
+				className="flex flex-col items-center w-screen min-h-screen m-0 p-0"
 				style={{ fontFamily: "Raleway" }}
 			>
 				{videoPermission === null && (
@@ -102,7 +249,6 @@ export default function ConnectPage() {
 						<motion.label
 							className="text-4xl"
 							variants={ConstituentPageElementsVariants}
-							htmlFor="username"
 						>
 							Your media device could not be accessed.
 							<br className="mt-8 block" />
@@ -114,25 +260,67 @@ export default function ConnectPage() {
 					</div>
 				)}
 
-				<div className="flex flex-col items-center w-full mt-12 mob:mt-32">
-					{videoPermission && (
+				<div className="flex flex-col items-center w-full h-full pt-12 mob:pt-32">
+					{videoPermission && !callInProgress && (
 						<motion.div
-							className="flex flex-col items-center w-4/5 text-2xl text-center mb-80"
+							className={`flex flex-col items-center w-4/5 text-2xl text-center mb-8 ${
+								callInProgress ? "hidden" : ""
+							}`}
 							variants={ConstituentPageElementsVariants}
 						>
 							Looking good! You can now start a call.
 						</motion.div>
 					)}
 					<motion.video
-						ref={videoRef}
+						ref={remoteVideoRef}
+						id="remoteVideo"
+						autoPlay
+						className={`w-96 mt-16 mob:mt-24 rounded-3xl ${
+							callInProgress
+								? "wide:absolute w-11/12 max-w-3xl wide:justify-self-center mob:mt-4"
+								: "hidden"
+						}`}
+						variants={ConstituentPageElementsVariants}
+					></motion.video>
+					<motion.video
+						ref={localVideoRef}
 						id="localVideo"
-						className="w-96 mob:w-80 fixed mt-16 mob:mt-24 rounded-3xl"
+						autoPlay
+						className={`w-96 mob:w-80 mt-16 mob:mt-24 rounded-3xl ${
+							callInProgress
+								? "wide:absolute wide:right-8 wide:bottom-8 z-10 w-48 mob:w-11/12 mob:relative mob:mt-4"
+								: ""
+						}`}
 						muted
 						variants={ConstituentPageElementsVariants}
 					></motion.video>
+					{callInProgress && (
+						<div className="flex flex-row justify-center">
+							<motion.button
+								className="bg-gradient-to-tr from-gray-700 to-gray-400 text-2xl focus:outline-none rounded-xl p-4 mt-1 mob:mt-8 ml-4 mr-4"
+								variants={ConstituentPageElementsVariants}
+								onClick={() => {
+									if (localVideoRef.current) {
+										localVideoRef.current.muted = !localVideoRef.current.muted;
+									}
+								}}
+							>
+								<FaVolumeMute />
+							</motion.button>
+							<motion.button
+								className="bg-gradient-to-tr from-gray-700 to-gray-400 text-2xl focus:outline-none rounded-xl p-4 mt-1 mob:mt-8 ml-4 mr-4"
+								variants={ConstituentPageElementsVariants}
+								onClick={endCall}
+							>
+								<FaTimes />
+							</motion.button>
+						</div>
+					)}
 					{videoPermission && (
 						<form
-							className="flex flex-col items-center text-2xl mt-8"
+							className={`flex flex-col items-center text-2xl mt-8 ${
+								callInProgress ? "hidden" : ""
+							}`}
 							style={{ fontFamily: "Raleway" }}
 							onSubmit={(e) => handleStart(e)}
 						>
@@ -150,7 +338,7 @@ export default function ConnectPage() {
 								name="username"
 								id="username"
 								value={usernameToCall}
-								onChange={(e) => setUsername(e.target.value)}
+								onChange={(e) => setUsernameToCall(e.target.value)}
 								required
 							/>
 							<p

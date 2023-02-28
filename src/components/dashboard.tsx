@@ -6,9 +6,14 @@ import {
 	ConstituentPageElementsVariants,
 } from "../framerMotionVariants/generalVariants";
 import "../componentSpecificStyles/dashboardStyles.css";
+import { useEffect } from "react";
 
 export default function DashboardComponent() {
 	const { user } = useAuth();
+
+	useEffect(() => {
+		localStorage.removeItem("firstLoad");
+	});
 
 	return (
 		<motion.div

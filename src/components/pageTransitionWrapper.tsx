@@ -9,6 +9,7 @@ import LandingPageComponent from "./landingPage";
 import EditProfile from "./editProfile";
 import SideMenuWrapper from "./sideMenuWrapper";
 import ConnectPage from "./connectPage";
+import CallEndedPage from "./callEnded";
 
 const PageTransitionWrapper = () => {
 	const location = useLocation();
@@ -20,6 +21,7 @@ const PageTransitionWrapper = () => {
 					<Route element={<SideMenuWrapper />}>
 						<Route path="/dashboard" element={<DashboardComponent />} />
 						<Route path="/connect" element={<ConnectPage />} />
+						<Route path="/call-ended" element={<CallEndedPage />} />
 						<Route path="/edit-profile" element={<EditProfile />} />
 					</Route>
 				</Route>
