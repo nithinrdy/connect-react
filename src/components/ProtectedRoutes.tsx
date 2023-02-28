@@ -4,7 +4,7 @@ import jwtDecode from "jwt-decode";
 import useRefreshToken from "../customHooksAndServices/refreshTokenHook";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { useSocket } from "../customHooksAndServices/useSocket";
+import useSocket from "../customHooksAndServices/useSocket";
 
 interface TokenContents {
 	exp: number;

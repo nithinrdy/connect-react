@@ -4,7 +4,7 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import useAuth from "../customHooksAndServices/authContextHook";
 import { Dispatch, SetStateAction } from "react";
 import { useEffect } from "react";
-import { useSocket } from "../customHooksAndServices/useSocket";
+import useSocket from "../customHooksAndServices/useSocket";
 
 export default function SideMenu(props: {
 	showMenu: boolean;

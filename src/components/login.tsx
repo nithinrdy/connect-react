@@ -97,8 +97,8 @@ export default function LoginComponent() {
 								required
 							/>
 							<p
-								className={`text-white text-center w-80 text-base mb-8 transition-opacity opacity-${
-									loginEmailError ? "1" : "0"
+								className={`text-white text-center w-80 text-base mb-8 transition-opacity ${
+									loginEmailError ? "opacity-1" : "opacity-0"
 								}`}
 							>
 								Please enter a valid email
@@ -120,8 +120,8 @@ export default function LoginComponent() {
 								required
 							/>
 							<p
-								className={`text-white text-center w-80 text-base mb-8 transition-opacity opacity-${
-									loginPasswordError ? "1" : "0"
+								className={`text-white text-center w-80 text-base mb-8 transition-opacity ${
+									loginPasswordError ? "opacity-1" : "opacity-0"
 								}`}
 							>
 								Password must contain a number, a capital letter, a small letter

@@ -119,8 +119,8 @@ export default function RegisterComponent() {
 								required
 							/>
 							<p
-								className={`text-white text-center w-80 text-base mb-8 transition-opacity opacity-${
-									registerEmailError ? "1" : "0"
+								className={`text-white text-center w-80 text-base mb-8 transition-opacity ${
+									registerEmailError ? "opacity-1" : "opacity-0"
 								}`}
 							>
 								Please enter a valid email
@@ -143,8 +143,8 @@ export default function RegisterComponent() {
 								required
 							/>
 							<p
-								className={`text-white text-center w-80 text-base mb-8 transition-opacity opacity-${
-									registerUsernameError ? "1" : "0"
+								className={`text-white text-center w-80 text-base mb-8 transition-opacity ${
+									registerUsernameError ? "opacity-1" : "opacity-0"
 								}`}
 							>
 								Username must contain alphanumeric characters and be 4 to 20
@@ -169,8 +169,8 @@ export default function RegisterComponent() {
 								required
 							/>
 							<p
-								className={`text-white text-center w-80 text-base mb-8 transition-opacity opacity-${
-									registerPasswordError ? "1" : "0"
+								className={`text-white text-center w-80 text-base mb-8 transition-opacity ${
+									registerPasswordError ? "opacity-1" : "opacity-0"
 								}`}
 							>
 								Password must contain a number, a capital letter, a small letter
