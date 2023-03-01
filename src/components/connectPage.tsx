@@ -12,29 +12,26 @@ import { useNavigate } from "react-router-dom";
 
 const USER_REGEX = /^[A-z0-9-_]{4,20}$/;
 
-const servers = {
-	iceServers: [
-		{
-			urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"],
-		},
-	],
-	iceCandidatePoolSize: 10,
-};
-const pc = new RTCPeerConnection(servers);
-let localStream = new MediaStream();
-
 export default function ConnectPage() {
-	const { socket } = useSocket();
+	const {
+		socket,
+		peerConnection,
+		setPeerConnection,
+		servers,
+		localStream,
+		videoPermission,
+		initiateCall,
+		setAcceptedOnce,
+		userIsNotOnline,
+		requestInProgress,
+		setRequestInProgress,
+	} = useSocket();
 	const { user } = useAuth();
 	const [usernameToCall, setUsernameToCall] = useState("");
 	const [usernameError, setUsernameError] = useState(false);
-	const [requestInProgress, setRequestInProgress] = useState(false);
 	const [callInProgress, setCallInProgress] = useState(false);
-	const [videoPermission, setVideoPermission] = useState<boolean | null>(null);
-	const [userIsNotOnline, setUserIsNotOnline] = useState(false);
 	const [caller, setCaller] = useState<string | null>(null);
 	const [callReceived, setCallReceived] = useState(false);
-	const [acceptedOnce, setAcceptedOnce] = useState(false);
 
 	const navigate = useNavigate();
 
@@ -42,33 +39,12 @@ export default function ConnectPage() {
 	const remoteVideoRef = React.useRef<HTMLVideoElement>(null);
 
 	useEffect(() => {
-		navigator.mediaDevices
-			.getUserMedia({ video: true, audio: true })
-			.then((stream) => {
-				localStream = stream;
-				localVideoRef.current!.srcObject = stream;
-				localVideoRef
-					.current!.play()
-					.then(() => {
-						localVideoRef.current!.muted = true;
-					})
-					.catch((err) => {
-						console.log(err);
-					});
-				setVideoPermission(true);
-				stream.getTracks().forEach((track) => {
-					pc.addTrack(track, localStream);
-				});
-				pc.ontrack = (e) => {
-					remoteVideoRef.current!.srcObject = e.streams[0];
-					setCallInProgress(true);
-				};
-			})
-			.catch((err) => {
-				console.log(err);
-				setVideoPermission(false);
-			});
-	}, []);
+		localVideoRef.current!.srcObject = localStream;
+		peerConnection.ontrack = (e) => {
+			remoteVideoRef.current!.srcObject = e.streams[0];
+			setCallInProgress(true);
+		};
+	}, [localStream, peerConnection]);
 
 	useEffect(() => {
 		if (USER_REGEX.test(usernameToCall) || usernameToCall.length === 0) {
@@ -79,24 +55,11 @@ export default function ConnectPage() {
 	}, [usernameToCall]);
 
 	useEffect(() => {
-		socket.off("incomingCall");
-		socket.on("incomingCall", (data) => {
-			if (acceptedOnce) {
-				socket.emit("acceptCall", { caller: data.caller });
-				setAcceptedOnce(false);
-				return;
-			}
-			console.log(data);
-			window.confirm("Incoming call from " + data.caller + ". Accept?")
-				? socket.emit("acceptCall", { caller: data.caller }) &&
-				  setAcceptedOnce(true)
-				: socket.emit("rejectCall", { caller: data.caller });
-		});
 		socket.on("incomingOffer", (data) => {
 			const { caller, sdp, type } = data;
 			setCaller(caller);
 			setCallReceived(true);
-			pc.onicecandidate = (e) => {
+			peerConnection.onicecandidate = (e) => {
 				if (e.candidate) {
 					socket.emit("sendCandidate", {
 						to: caller,
@@ -105,22 +68,28 @@ export default function ConnectPage() {
 				}
 			};
 
-			if (pc.currentRemoteDescription) {
+			if (peerConnection.currentRemoteDescription) {
 				return;
 			}
 
-			pc.setRemoteDescription(new RTCSessionDescription({ sdp, type }));
-			pc.createAnswer()
+			peerConnection.setRemoteDescription(
+				new RTCSessionDescription({ sdp, type })
+			);
+			peerConnection
+				.createAnswer()
 				.then((answer) => {
-					pc.setLocalDescription(answer);
+					peerConnection.setLocalDescription(answer);
 					socket.emit("sendAnswer", {
 						to: caller,
 						sdp: answer.sdp,
 						type: answer.type,
 					});
 					socket.on("incomingCandidate", (data) => {
-						if (pc.currentRemoteDescription && pc.currentLocalDescription) {
-							pc.addIceCandidate(new RTCIceCandidate(data));
+						if (
+							peerConnection.currentRemoteDescription &&
+							peerConnection.currentLocalDescription
+						) {
+							peerConnection.addIceCandidate(new RTCIceCandidate(data));
 						}
 					});
 				})
@@ -131,47 +100,22 @@ export default function ConnectPage() {
 
 		socket.on("endCall", () => {
 			setCallInProgress(false);
-			pc.close();
-			pc.onicecandidate = null;
+			peerConnection.onicecandidate = null;
+			setPeerConnection(new RTCPeerConnection(servers));
+			setAcceptedOnce(false);
 			navigate("/call-ended");
 		});
-	}, [socket, navigate, acceptedOnce]);
+	}, [
+		socket,
+		navigate,
+		peerConnection,
+		setPeerConnection,
+		servers,
+		setAcceptedOnce,
+	]);
 
 	const startCall = () => {
-		pc.onicecandidate = (e) => {
-			if (e && e.candidate) {
-				socket.emit("sendCandidate", {
-					to: usernameToCall,
-					candidate: e.candidate,
-				});
-			}
-		};
-
-		if (pc.currentLocalDescription) {
-			return;
-		}
-
-		pc.createOffer().then((offer) => {
-			pc.setLocalDescription(offer);
-			socket.emit("sendOffer", {
-				callee: usernameToCall,
-				caller: user.username,
-				sdp: offer.sdp,
-				type: offer.type,
-			});
-			socket.on("incomingAnswer", (data) => {
-				const { sdp, type } = data;
-				if (pc.currentRemoteDescription) {
-					return;
-				}
-				pc.setRemoteDescription(new RTCSessionDescription({ sdp, type }));
-			});
-			socket.on("incomingCandidate", (data) => {
-				if (pc.currentRemoteDescription && pc.currentLocalDescription) {
-					pc.addIceCandidate(new RTCIceCandidate(data));
-				}
-			});
-		});
+		initiateCall(usernameToCall, user);
 	};
 
 	const handleStart = (event: React.FormEvent<HTMLFormElement>) => {
@@ -205,21 +149,14 @@ export default function ConnectPage() {
 
 	const endCall = () => {
 		setCallInProgress(false);
-		pc.close();
-		pc.onicecandidate = null;
+		peerConnection.onicecandidate = null;
+		setPeerConnection(new RTCPeerConnection(servers));
+		setAcceptedOnce(false);
 		socket.emit("endOtherEnd", {
 			otherEnd: callReceived ? caller : usernameToCall,
 		});
 		navigate("/call-ended");
 	};
-
-	useEffect(() => {
-		socket.on("notOnline", (data) => {
-			setRequestInProgress(false);
-			setUserIsNotOnline(true);
-			setTimeout(() => setUserIsNotOnline(false), 2500);
-		});
-	}, [socket]);
 
 	return (
 		<motion.div
@@ -300,9 +237,9 @@ export default function ConnectPage() {
 								className="bg-gradient-to-tr from-gray-700 to-gray-400 text-2xl focus:outline-none rounded-xl p-4 mt-1 mob:mt-8 ml-4 mr-4"
 								variants={ConstituentPageElementsVariants}
 								onClick={() => {
-									if (localVideoRef.current) {
-										localVideoRef.current.muted = !localVideoRef.current.muted;
-									}
+									localStream &&
+										(localStream.getAudioTracks()[0].enabled =
+											!localStream.getAudioTracks()[0].enabled);
 								}}
 							>
 								<FaVolumeMute />

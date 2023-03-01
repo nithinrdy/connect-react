@@ -10,24 +10,27 @@ import EditProfile from "./editProfile";
 import SideMenuWrapper from "./sideMenuWrapper";
 import ConnectPage from "./connectPage";
 import CallEndedPage from "./callEnded";
+import { SocketProvider } from "../contexts/socketProvider";
 
 const PageTransitionWrapper = () => {
 	const location = useLocation();
 	return (
 		<AnimatePresence mode="wait">
-			<Routes location={location} key={location.pathname}>
-				<Route path="/" element={<LandingPageComponent />} />
-				<Route element={<ProtectedRoutes />}>
-					<Route element={<SideMenuWrapper />}>
-						<Route path="/dashboard" element={<DashboardComponent />} />
-						<Route path="/connect" element={<ConnectPage />} />
-						<Route path="/call-ended" element={<CallEndedPage />} />
-						<Route path="/edit-profile" element={<EditProfile />} />
+			<SocketProvider>
+				<Routes location={location} key={location.pathname}>
+					<Route path="/" element={<LandingPageComponent />} />
+					<Route element={<ProtectedRoutes />}>
+						<Route element={<SideMenuWrapper />}>
+							<Route path="/dashboard" element={<DashboardComponent />} />
+							<Route path="/connect" element={<ConnectPage />} />
+							<Route path="/call-ended" element={<CallEndedPage />} />
+							<Route path="/edit-profile" element={<EditProfile />} />
+						</Route>
 					</Route>
-				</Route>
-				<Route path="/login" element={<LoginComponent />} />
-				<Route path="/register" element={<RegisterComponent />} />
-			</Routes>
+					<Route path="/login" element={<LoginComponent />} />
+					<Route path="/register" element={<RegisterComponent />} />
+				</Routes>
+			</SocketProvider>
 		</AnimatePresence>
 	);
 };
