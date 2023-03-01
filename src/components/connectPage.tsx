@@ -184,13 +184,14 @@ export default function ConnectPage() {
 		if (otherPerson) {
 			addFavorite(otherPerson)
 				.then((res) => {
-					if (res.status === 200) {
+					if (res.status === 201) {
 						window.alert("Added to favorites");
 					} else {
-						window.alert(res.response.data);
+						window.alert(res.data);
 					}
 				})
-				.catch(() => {
+				.catch((err) => {
+					console.log(err);
 					window.alert("Something went wrong");
 				});
 		}

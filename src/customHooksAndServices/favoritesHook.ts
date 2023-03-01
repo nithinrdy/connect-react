@@ -1,8 +1,9 @@
-import { axiosPrivateService } from "./../axios/axiosBase";
+import { useAxiosPrivateServiceWithInterceptors } from "./useAxiosPrivateHook";
 import useAuth from "./authContextHook";
 
 export default function useFavorites() {
 	const { user } = useAuth();
+	const axiosPrivateService = useAxiosPrivateServiceWithInterceptors();
 	const addFavorite = async (userToAdd: string) => {
 		return axiosPrivateService("/api/favorite/add", {
 			method: "POST",
