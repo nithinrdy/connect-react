@@ -29,7 +29,7 @@ export default function ProtectedRoutes() {
 			return;
 		}
 		setSocket(
-			io("http://localhost:5000", {
+			io("http://localhost:8000", {
 				query: {
 					username: user.username,
 				},

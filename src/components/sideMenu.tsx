@@ -10,7 +10,7 @@ export default function SideMenu(props: {
 	showMenu: boolean;
 	setShowMenu: Dispatch<SetStateAction<boolean>>;
 }) {
-	const { socket, setSocketConnected } = useSocket();
+	const { socket, setSocket, setSocketConnected } = useSocket();
 	const { showMenu, setShowMenu } = props;
 	const { logout } = useLogout();
 	const navigate = useNavigate();
@@ -27,6 +27,9 @@ export default function SideMenu(props: {
 	}, [showMenu]);
 
 	const handleLogout = () => {
+		if (!socket) {
+			return;
+		}
 		logout().then(() => {
 			setUser({
 				username: "",
@@ -35,7 +38,7 @@ export default function SideMenu(props: {
 				nickname: "",
 			});
 			navigate("/");
-			socket.disconnect();
+			setSocket(null);
 			setSocketConnected(false);
 		});
 	};

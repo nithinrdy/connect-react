@@ -25,6 +25,8 @@ export default function ConnectPage() {
 		userIsNotOnline,
 		requestInProgress,
 		setRequestInProgress,
+		incomingCaller,
+		setIncomingCaller,
 	} = useSocket();
 	const { user } = useAuth();
 	const [usernameToCall, setUsernameToCall] = useState("");
@@ -40,11 +42,19 @@ export default function ConnectPage() {
 
 	useEffect(() => {
 		localVideoRef.current!.srcObject = localStream;
+		localVideoRef.current!.play().then(() => {
+			if (incomingCaller) {
+				if (socket) {
+					socket.emit("acceptCall", { caller: incomingCaller });
+					setIncomingCaller("");
+				}
+			}
+		});
 		peerConnection.ontrack = (e) => {
 			remoteVideoRef.current!.srcObject = e.streams[0];
 			setCallInProgress(true);
 		};
-	}, [localStream, peerConnection]);
+	}, [localStream, peerConnection, incomingCaller, socket, setIncomingCaller]);
 
 	useEffect(() => {
 		if (USER_REGEX.test(usernameToCall) || usernameToCall.length === 0) {
@@ -55,6 +65,9 @@ export default function ConnectPage() {
 	}, [usernameToCall]);
 
 	useEffect(() => {
+		if (!socket) {
+			return;
+		}
 		socket.on("incomingOffer", (data) => {
 			const { caller, sdp, type } = data;
 			setCaller(caller);
@@ -125,7 +138,8 @@ export default function ConnectPage() {
 			requestInProgress ||
 			callInProgress ||
 			requestInProgress ||
-			usernameToCall === user.username
+			usernameToCall === user.username ||
+			!socket
 		) {
 			return;
 		}
@@ -148,6 +162,9 @@ export default function ConnectPage() {
 	};
 
 	const endCall = () => {
+		if (!socket) {
+			return;
+		}
 		setCallInProgress(false);
 		peerConnection.onicecandidate = null;
 		setPeerConnection(new RTCPeerConnection(servers));

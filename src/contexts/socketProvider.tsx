@@ -7,13 +7,13 @@ import {
 	useState,
 	useRef,
 } from "react";
-import { Socket, io } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import { useNavigate } from "react-router-dom";
 import { UserInfo } from "../models/userInfoModel";
 
 interface SocketContextType {
-	socket: Socket;
-	setSocket: Dispatch<SetStateAction<Socket>>;
+	socket: Socket | null;
+	setSocket: Dispatch<SetStateAction<Socket | null>>;
 	socketConnected: boolean;
 	setSocketConnected: Dispatch<SetStateAction<boolean>>;
 	servers: RTCConfiguration;
@@ -28,6 +28,8 @@ interface SocketContextType {
 	userIsNotOnline: boolean;
 	requestInProgress: boolean;
 	setRequestInProgress: Dispatch<SetStateAction<boolean>>;
+	incomingCaller: string;
+	setIncomingCaller: Dispatch<SetStateAction<string>>;
 }
 
 const servers = {
@@ -40,7 +42,7 @@ const servers = {
 };
 
 export const SocketContext = createContext<SocketContextType>({
-	socket: io(),
+	socket: null,
 	setSocket: () => {},
 	socketConnected: false,
 	setSocketConnected: () => {},
@@ -56,11 +58,13 @@ export const SocketContext = createContext<SocketContextType>({
 	userIsNotOnline: false,
 	requestInProgress: false,
 	setRequestInProgress: () => {},
+	incomingCaller: "",
+	setIncomingCaller: () => {},
 });
 
 export const SocketProvider = (props: { children: ReactNode }) => {
 	const { children } = props;
-	const [socket, setSocket] = useState<Socket>(io());
+	const [socket, setSocket] = useState<Socket | null>(null);
 	const [socketConnected, setSocketConnected] = useState(false);
 	const [peerConnection, setPeerConnection] = useState<RTCPeerConnection>(
 		new RTCPeerConnection(servers)
@@ -70,10 +74,14 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 	const [callInProgress, setCallInProgress] = useState(false);
 	const [requestInProgress, setRequestInProgress] = useState(false);
 	const [userIsNotOnline, setUserIsNotOnline] = useState(false);
+	const [incomingCaller, setIncomingCaller] = useState("");
 	const localStream = useRef<MediaStream | null>(null);
 	const navigate = useNavigate();
 
 	useEffect(() => {
+		if (!socket) {
+			return;
+		}
 		navigator.mediaDevices
 			.getUserMedia({ video: true, audio: true })
 			.then((stream) => {
@@ -90,7 +98,6 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 		socket.off("incomingCall");
 		socket.on("incomingCall", (data) => {
 			console.log("incoming call");
-			navigate("/connect");
 			if (acceptedOnce) {
 				socket.emit("acceptCall", { caller: data.caller });
 				return;
@@ -98,7 +105,8 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 			if (
 				window.confirm("Incoming call from " + data.caller + ". Accept call?")
 			) {
-				socket.emit("acceptCall", { caller: data.caller });
+				navigate("/connect");
+				setIncomingCaller(data.caller);
 				setAcceptedOnce(true);
 			} else {
 				socket.emit("rejectCall", { caller: data.caller });
@@ -119,6 +127,9 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 	]);
 
 	const initiateCall = (usernameToCall: string, user: UserInfo) => {
+		if (!socket) {
+			return;
+		}
 		peerConnection.onicecandidate = (e) => {
 			if (e && e.candidate) {
 				socket.emit("sendCandidate", {
@@ -178,6 +189,8 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 				userIsNotOnline,
 				requestInProgress,
 				setRequestInProgress,
+				incomingCaller,
+				setIncomingCaller,
 			}}
 		>
 			{children}
