@@ -248,9 +248,9 @@ export default function ConnectPage() {
 						</motion.div>
 					)}
 					<div
-						className={`bg-gradient-to-tr from-gray-700 to-gray-400 mt-16 mob:mt-24 relative flex justify-center rounded-full animate-ping wide:origin-center mob:mb-16 ${
+						className={`bg-gradient-to-tr from-gray-700 to-gray-400 mt-24 mob:mt-24 relative flex justify-center items-center rounded-full animate-ping wide:origin-center mob:mb-40 ${
 							requestInProgress
-								? "wide:absolute w-5/12 max-w-3xl transition-transform wide:justify-self-center"
+								? "wide:absolute w-5/12 wide:w-64 wide:h-64 max-w-3xl transition-transform"
 								: "hidden"
 						}`}
 					>
