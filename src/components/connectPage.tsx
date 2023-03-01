@@ -7,8 +7,9 @@ import {
 import "../componentSpecificStyles/connectStyles.css";
 import useSocket from "../customHooksAndServices/useSocket";
 import useAuth from "../customHooksAndServices/authContextHook";
-import { FaPhone, FaTimes, FaVolumeMute } from "react-icons/fa";
+import { FaPhone, FaTimes, FaVolumeMute, FaStar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import useFavorites from "../customHooksAndServices/favoritesHook";
 
 const USER_REGEX = /^[A-z0-9-_]{4,20}$/;
 
@@ -29,11 +30,13 @@ export default function ConnectPage() {
 		setIncomingCaller,
 	} = useSocket();
 	const { user } = useAuth();
+	const { addFavorite } = useFavorites();
 	const [usernameToCall, setUsernameToCall] = useState("");
 	const [usernameError, setUsernameError] = useState(false);
 	const [callInProgress, setCallInProgress] = useState(false);
 	const [caller, setCaller] = useState<string | null>(null);
 	const [callReceived, setCallReceived] = useState(false);
+	const [otherPerson, setOtherPerson] = useState<string | null>(null);
 
 	const navigate = useNavigate();
 
@@ -46,6 +49,7 @@ export default function ConnectPage() {
 			if (incomingCaller) {
 				if (socket) {
 					socket.emit("acceptCall", { caller: incomingCaller });
+					setOtherPerson(incomingCaller);
 					setIncomingCaller("");
 				}
 			}
@@ -153,6 +157,7 @@ export default function ConnectPage() {
 			startCall();
 			setCallInProgress(true);
 			setRequestInProgress(false);
+			setOtherPerson(usernameToCall);
 		});
 		socket.on("callRejected", () => {
 			setCallInProgress(false);
@@ -173,6 +178,22 @@ export default function ConnectPage() {
 			otherEnd: callReceived ? caller : usernameToCall,
 		});
 		navigate("/call-ended");
+	};
+
+	const favoriteUser = () => {
+		if (otherPerson) {
+			addFavorite(otherPerson)
+				.then((res) => {
+					if (res.status === 200) {
+						window.alert("Added to favorites");
+					} else {
+						window.alert(res.response.data);
+					}
+				})
+				.catch(() => {
+					window.alert("Something went wrong");
+				});
+		}
 	};
 
 	return (
@@ -218,30 +239,41 @@ export default function ConnectPage() {
 					{videoPermission && !callInProgress && (
 						<motion.div
 							className={`flex flex-col items-center w-4/5 text-2xl text-center mb-8 ${
-								callInProgress ? "hidden" : ""
+								callInProgress || requestInProgress ? "hidden" : ""
 							}`}
 							variants={ConstituentPageElementsVariants}
 						>
 							Looking good! You can now start a call.
 						</motion.div>
 					)}
+					<div
+						className={`bg-gradient-to-tr from-gray-700 to-gray-400 mt-16 mob:mt-24 relative flex justify-center rounded-full animate-ping wide:origin-center mob:mb-16 ${
+							requestInProgress
+								? "wide:absolute w-5/12 max-w-3xl transition-transform wide:justify-self-center"
+								: "hidden"
+						}`}
+					>
+						<FaPhone className="w-40 h-40 wide:absolute mob:mb-16 mob:mt-16"></FaPhone>
+					</div>
 					<motion.video
+						style={{ rotateY: "180deg" }}
 						ref={remoteVideoRef}
 						id="remoteVideo"
 						autoPlay
-						className={`w-96 mt-16 mob:mt-24 rounded-3xl ${
+						className={`w-96 mt-16 mob:mt-24 rounded-3xl  ${
 							callInProgress
-								? "wide:absolute w-11/12 max-w-3xl wide:justify-self-center mob:mt-4"
+								? "wide:absolute w-11/12 max-w-3xl transition-transform wide:justify-self-center mob:mt-4"
 								: "hidden"
 						}`}
 						variants={ConstituentPageElementsVariants}
 					></motion.video>
 					<motion.video
+						style={{ rotateY: "180deg" }}
 						ref={localVideoRef}
 						id="localVideo"
 						autoPlay
-						className={`w-96 mob:w-80 mt-16 mob:mt-24 rounded-3xl ${
-							callInProgress
+						className={`w-96 mob:w-80 mt-16 mob:mt-24 rounded-3xl transition-transform ${
+							callInProgress || requestInProgress
 								? "wide:absolute wide:right-8 wide:bottom-8 z-10 w-48 mob:w-11/12 mob:relative mob:mt-4"
 								: ""
 						}`}
@@ -249,9 +281,16 @@ export default function ConnectPage() {
 						variants={ConstituentPageElementsVariants}
 					></motion.video>
 					{callInProgress && (
-						<div className="flex flex-row justify-center">
+						<div className="flex flex-row justify-center mt--4 z-20 mb-8">
 							<motion.button
-								className="bg-gradient-to-tr from-gray-700 to-gray-400 text-2xl focus:outline-none rounded-xl p-4 mt-1 mob:mt-8 ml-4 mr-4"
+								className="bg-gradient-to-tr from-gray-700 to-yellow-300 text-3xl mob:text-6xl focus:outline-none rounded-2xl p-3 mt-1 mob:mt-8 ml-4 mr-4"
+								variants={ConstituentPageElementsVariants}
+								onClick={favoriteUser}
+							>
+								<FaStar />
+							</motion.button>
+							<motion.button
+								className="bg-gradient-to-tr from-gray-700 to-gray-400 text-3xl mob:text-6xl focus:outline-none rounded-2xl p-3 mt-1 mob:mt-8 ml-4 mr-4"
 								variants={ConstituentPageElementsVariants}
 								onClick={() => {
 									localStream &&
@@ -262,7 +301,7 @@ export default function ConnectPage() {
 								<FaVolumeMute />
 							</motion.button>
 							<motion.button
-								className="bg-gradient-to-tr from-gray-700 to-gray-400 text-2xl focus:outline-none rounded-xl p-4 mt-1 mob:mt-8 ml-4 mr-4"
+								className="bg-gradient-to-tr from-gray-700 to-red-400 text-3xl mob:text-6xl focus:outline-none rounded-2xl p-3 mt-1 mob:mt-8 ml-4 mr-4"
 								variants={ConstituentPageElementsVariants}
 								onClick={endCall}
 							>
@@ -273,7 +312,7 @@ export default function ConnectPage() {
 					{videoPermission && (
 						<form
 							className={`flex flex-col items-center text-2xl mt-8 ${
-								callInProgress ? "hidden" : ""
+								callInProgress || requestInProgress ? "hidden" : ""
 							}`}
 							style={{ fontFamily: "Raleway" }}
 							onSubmit={(e) => handleStart(e)}
