@@ -4,7 +4,6 @@ import {
 	RouteTransitionVariants,
 	ConstituentPageElementsVariants,
 } from "../framerMotionVariants/generalVariants";
-import "../componentSpecificStyles/connectStyles.css";
 import useConnection from "../customHooksAndServices/useConnection";
 import useAuth from "../customHooksAndServices/authContextHook";
 import { FaPhone, FaTimes, FaVolumeMute, FaStar } from "react-icons/fa";
@@ -271,7 +270,7 @@ export default function ConnectPage() {
 								: "hidden"
 						}`}
 					>
-						<FaPhone className="w-40 h-40 wide:absolute mob:mb-16 mob:mt-16"></FaPhone>
+						<FaPhone className="w-40 h-40 wide:absolute mob:mb-16 mob:mt-16" />
 					</div>
 					<motion.video
 						style={{ rotateY: "180deg" }}
@@ -371,7 +370,7 @@ export default function ConnectPage() {
 							<motion.button
 								variants={ConstituentPageElementsVariants}
 								type="submit"
-								className="px-2 py-2 relative connect-page-start-button transition-colors mb-8 hover:text-black after:rounded-full after:origin-center"
+								className="p-4 relative connect-page-start-button transition-colors mb-8 hover:text-black hover:bg-white rounded-full duration-300"
 								disabled={requestInProgress || usernameError}
 							>
 								<FaPhone className="text-4xl" />
