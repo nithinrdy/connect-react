@@ -76,7 +76,7 @@ export default function LoginComponent() {
 							LOGIN
 						</motion.h1>
 						<form
-							className="flex flex-col items-center text-2xl"
+							className="flex flex-col items-center text-2xl w-full"
 							style={{ fontFamily: "Raleway" }}
 							onSubmit={handleLogin}
 						>
@@ -88,7 +88,7 @@ export default function LoginComponent() {
 							</motion.label>
 							<motion.input
 								variants={LoginAndRegisterPageElementVariants}
-								className="bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4"
+								className="bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4 mob:w-4/5"
 								type="email"
 								name="email"
 								id="login-email"
@@ -111,7 +111,7 @@ export default function LoginComponent() {
 							</motion.label>
 							<motion.input
 								variants={LoginAndRegisterPageElementVariants}
-								className="bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4"
+								className="bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4 mob:w-4/5"
 								type="password"
 								name="password"
 								id="login-password"

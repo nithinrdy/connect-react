@@ -97,7 +97,7 @@ export default function RegisterComponent() {
 							REGISTER
 						</motion.h1>
 						<form
-							className="flex flex-col items-center text-2xl"
+							className="flex flex-col items-center text-2xl w-full"
 							style={{ fontFamily: "Raleway" }}
 							onSubmit={handleRegister}
 						>
@@ -109,7 +109,7 @@ export default function RegisterComponent() {
 							</motion.label>
 							<motion.input
 								variants={LoginAndRegisterPageElementVariants}
-								className="bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4"
+								className="bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4 mob:w-4/5"
 								type="email"
 								name="email"
 								id="register-email"
@@ -133,7 +133,7 @@ export default function RegisterComponent() {
 							</motion.label>
 							<motion.input
 								variants={LoginAndRegisterPageElementVariants}
-								className="bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4"
+								className="bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4 mob:w-4/5"
 								type="text"
 								name="username"
 								id="username"
@@ -159,7 +159,7 @@ export default function RegisterComponent() {
 							</motion.label>
 							<motion.input
 								variants={LoginAndRegisterPageElementVariants}
-								className="bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4"
+								className="bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4 mob:w-4/5"
 								type="password"
 								name="password"
 								id="register-password"
@@ -184,7 +184,7 @@ export default function RegisterComponent() {
 							</motion.label>
 							<motion.input
 								variants={LoginAndRegisterPageElementVariants}
-								className="bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4 mb-8"
+								className="bg-gradient-to-r from-gray-800 to-gray-600 focus:outline-none rounded-xl p-3 mt-4 mb-8 mob:w-4/5"
 								type="text"
 								name="nickname"
 								id="register-nickname"
