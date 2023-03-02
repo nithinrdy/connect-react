@@ -31,7 +31,7 @@ export default function ProtectedRoutes() {
 			return;
 		}
 		setSocket(
-			io({
+			io("http://localhost:8000", {
 				query: {
 					username: user.username,
 				},
