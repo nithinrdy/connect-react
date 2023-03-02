@@ -42,6 +42,11 @@ export default function DashboardComponent() {
 							Connect!
 						</button>
 					</Link>
+					<Link to="/favorites" className="mt-8 flex flex-col mob:items-center">
+						<button className="dashboard-favorites-button relative px-2 py-2 transition-colors hover:text-black mob:border-b-2">
+							View your favorites
+						</button>
+					</Link>
 				</motion.div>
 			</div>
 		</motion.div>

@@ -4,13 +4,13 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import useAuth from "../customHooksAndServices/authContextHook";
 import { Dispatch, SetStateAction } from "react";
 import { useEffect } from "react";
-import useSocket from "../customHooksAndServices/useSocket";
+import useConnection from "../customHooksAndServices/useConnection";
 
 export default function SideMenu(props: {
 	showMenu: boolean;
 	setShowMenu: Dispatch<SetStateAction<boolean>>;
 }) {
-	const { socket, setSocket, setSocketConnected } = useSocket();
+	const { socket, setSocket, setSocketConnected } = useConnection();
 	const { showMenu, setShowMenu } = props;
 	const { logout } = useLogout();
 	const navigate = useNavigate();
@@ -55,6 +55,9 @@ export default function SideMenu(props: {
 			<Link to="edit-profile" onClick={() => setShowMenu(false)}>
 				<button>Edit your profile</button>
 			</Link>
+			<Link to="favorites" onClick={() => setShowMenu(false)}>
+				<button>View your favorites</button>
+			</Link>
 			{pathname !== "/dashboard" ? (
 				<Link
 					to="/dashboard"
@@ -65,7 +68,7 @@ export default function SideMenu(props: {
 				</Link>
 			) : null}
 			<button
-				className={pathname === "/dashboard" ? "mt-auto" : ""}
+				className={`logout-button ${pathname === "/dashboard" ? "mt-auto" : ""}`}
 				onClick={() => {
 					handleLogout();
 					setShowMenu(false);

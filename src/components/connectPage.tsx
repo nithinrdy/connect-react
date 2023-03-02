@@ -5,7 +5,7 @@ import {
 	ConstituentPageElementsVariants,
 } from "../framerMotionVariants/generalVariants";
 import "../componentSpecificStyles/connectStyles.css";
-import useSocket from "../customHooksAndServices/useSocket";
+import useConnection from "../customHooksAndServices/useConnection";
 import useAuth from "../customHooksAndServices/authContextHook";
 import { FaPhone, FaTimes, FaVolumeMute, FaStar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -28,7 +28,9 @@ export default function ConnectPage() {
 		setRequestInProgress,
 		incomingCaller,
 		setIncomingCaller,
-	} = useSocket();
+		callFromFavorites,
+		setCallFromFavorites,
+	} = useConnection();
 	const { user } = useAuth();
 	const { addFavorite } = useFavorites();
 	const [usernameToCall, setUsernameToCall] = useState("");
@@ -36,7 +38,9 @@ export default function ConnectPage() {
 	const [callInProgress, setCallInProgress] = useState(false);
 	const [caller, setCaller] = useState<string | null>(null);
 	const [callReceived, setCallReceived] = useState(false);
-	const [otherPerson, setOtherPerson] = useState<string | null>(null);
+	const [otherPersonInCall, setOtherPersonInCall] = useState<string | null>(
+		null
+	);
 
 	const navigate = useNavigate();
 
@@ -49,16 +53,29 @@ export default function ConnectPage() {
 			if (incomingCaller) {
 				if (socket) {
 					socket.emit("acceptCall", { caller: incomingCaller });
-					setOtherPerson(incomingCaller);
+					setOtherPersonInCall(incomingCaller);
 					setIncomingCaller("");
 				}
+			} else if (callFromFavorites) {
+				setUsernameToCall(callFromFavorites);
+				setCallFromFavorites("");
 			}
 		});
 		peerConnection.ontrack = (e) => {
 			remoteVideoRef.current!.srcObject = e.streams[0];
 			setCallInProgress(true);
 		};
-	}, [localStream, peerConnection, incomingCaller, socket, setIncomingCaller]);
+	}, [
+		localStream,
+		peerConnection,
+		incomingCaller,
+		socket,
+		setIncomingCaller,
+		callFromFavorites,
+		setCallFromFavorites,
+		initiateCall,
+		user,
+	]);
 
 	useEffect(() => {
 		if (USER_REGEX.test(usernameToCall) || usernameToCall.length === 0) {
@@ -157,7 +174,7 @@ export default function ConnectPage() {
 			startCall();
 			setCallInProgress(true);
 			setRequestInProgress(false);
-			setOtherPerson(usernameToCall);
+			setOtherPersonInCall(usernameToCall);
 		});
 		socket.on("callRejected", () => {
 			setCallInProgress(false);
@@ -181,8 +198,8 @@ export default function ConnectPage() {
 	};
 
 	const favoriteUser = () => {
-		if (otherPerson) {
-			addFavorite(otherPerson)
+		if (otherPersonInCall) {
+			addFavorite(otherPersonInCall)
 				.then((res) => {
 					if (res.status === 201) {
 						window.alert("Added to favorites");

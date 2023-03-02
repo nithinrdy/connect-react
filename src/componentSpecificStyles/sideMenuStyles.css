@@ -20,6 +20,10 @@
 	@apply border-white relative border-t-2 text-white text-2xl mob:text-2xl p-3 transition-colors w-full;
 }
 
+.side-menu .logout-button {
+	@apply mob:w-4/5;
+}
+
 .side-menu button:hover {
 	@apply text-black;
 }

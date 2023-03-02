@@ -11,7 +11,7 @@ import { Socket } from "socket.io-client";
 import { useNavigate } from "react-router-dom";
 import { UserInfo } from "../models/userInfoModel";
 
-interface SocketContextType {
+interface ConnectionContextType {
 	socket: Socket | null;
 	setSocket: Dispatch<SetStateAction<Socket | null>>;
 	socketConnected: boolean;
@@ -30,6 +30,8 @@ interface SocketContextType {
 	setRequestInProgress: Dispatch<SetStateAction<boolean>>;
 	incomingCaller: string;
 	setIncomingCaller: Dispatch<SetStateAction<string>>;
+	callFromFavorites: string;
+	setCallFromFavorites: Dispatch<SetStateAction<string>>;
 }
 
 const servers = {
@@ -41,7 +43,7 @@ const servers = {
 	iceCandidatePoolSize: 10,
 };
 
-export const SocketContext = createContext<SocketContextType>({
+export const ConnectionContext = createContext<ConnectionContextType>({
 	socket: null,
 	setSocket: () => {},
 	socketConnected: false,
@@ -60,9 +62,11 @@ export const SocketContext = createContext<SocketContextType>({
 	setRequestInProgress: () => {},
 	incomingCaller: "",
 	setIncomingCaller: () => {},
+	callFromFavorites: "",
+	setCallFromFavorites: () => {},
 });
 
-export const SocketProvider = (props: { children: ReactNode }) => {
+export const ConnectionProvider = (props: { children: ReactNode }) => {
 	const { children } = props;
 	const [socket, setSocket] = useState<Socket | null>(null);
 	const [socketConnected, setSocketConnected] = useState(false);
@@ -75,6 +79,7 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 	const [requestInProgress, setRequestInProgress] = useState(false);
 	const [userIsNotOnline, setUserIsNotOnline] = useState(false);
 	const [incomingCaller, setIncomingCaller] = useState("");
+	const [callFromFavorites, setCallFromFavorites] = useState("");
 	const localStream = useRef<MediaStream | null>(null);
 	const navigate = useNavigate();
 
@@ -171,7 +176,7 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 	};
 
 	return (
-		<SocketContext.Provider
+		<ConnectionContext.Provider
 			value={{
 				socket,
 				setSocket,
@@ -191,9 +196,11 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 				setRequestInProgress,
 				incomingCaller,
 				setIncomingCaller,
+				callFromFavorites,
+				setCallFromFavorites,
 			}}
 		>
 			{children}
-		</SocketContext.Provider>
+		</ConnectionContext.Provider>
 	);
 };

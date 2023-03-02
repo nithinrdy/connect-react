@@ -4,7 +4,9 @@ import jwtDecode from "jwt-decode";
 import useRefreshToken from "../customHooksAndServices/refreshTokenHook";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import useSocket from "../customHooksAndServices/useSocket";
+import useConnection from "../customHooksAndServices/useConnection";
+import { RouteTransitionVariants } from "../framerMotionVariants/generalVariants";
+import { motion } from "framer-motion";
 
 interface TokenContents {
 	exp: number;
@@ -22,7 +24,7 @@ export default function ProtectedRoutes() {
 	const location = useLocation();
 	const currentTime = Date.now() / 1000;
 	const { socket, setSocket, socketConnected, setSocketConnected } =
-		useSocket();
+		useConnection();
 
 	useEffect(() => {
 		if (!user.username || socketConnected) {
@@ -55,9 +57,15 @@ export default function ProtectedRoutes() {
 	}, [decodedToken, currentTime, refreshToken, navigateTo, location]);
 
 	return loading ? (
-		<div className="">
-			<p>Loading...</p>
-		</div>
+		<motion.div
+			variants={RouteTransitionVariants}
+			initial="initial"
+			animate="animate"
+			exit="exit"
+			className="text-7xl text-white flex flex-col items-center"
+		>
+			<p className="mt-12">Loading...</p>
+		</motion.div>
 	) : (
 		<Outlet />
 	);
