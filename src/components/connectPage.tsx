@@ -52,6 +52,7 @@ export default function ConnectPage() {
 			if (incomingCaller) {
 				if (socket) {
 					socket.emit("acceptCall", { caller: incomingCaller });
+					setCallInProgress(true);
 					setOtherPersonInCall(incomingCaller);
 					setIncomingCaller("");
 				}
@@ -326,7 +327,7 @@ export default function ConnectPage() {
 							</motion.button>
 						</div>
 					)}
-					{videoPermission && (
+					{videoPermission && !callInProgress && (
 						<form
 							className={`flex flex-col items-center text-2xl mt-8 ${
 								callInProgress || requestInProgress ? "hidden" : ""
