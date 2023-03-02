@@ -273,7 +273,7 @@ export default function ConnectPage() {
 						<FaPhone className="w-40 h-40 wide:absolute mob:mb-16 mob:mt-16" />
 					</div>
 					<motion.video
-						style={{ rotateY: "180deg" }}
+						style={{ rotateY: "180deg", maxHeight: "80vh" }}
 						ref={remoteVideoRef}
 						id="remoteVideo"
 						autoPlay
