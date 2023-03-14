@@ -106,6 +106,10 @@ export const ConnectionProvider = (props: { children: ReactNode }) => {
 			});
 		socket.off("incomingCall");
 		socket.on("incomingCall", (data) => {
+			if (!videoPermission) {
+				socket.emit("rejectCall", { caller: data.caller });
+				return;
+			}
 			console.log("incoming call");
 			if (acceptedOnce) {
 				socket.emit("acceptCall", { caller: data.caller });
@@ -133,6 +137,7 @@ export const ConnectionProvider = (props: { children: ReactNode }) => {
 		peerConnection,
 		localStream,
 		navigate,
+		videoPermission,
 	]);
 
 	const initiateCall = (usernameToCall: string, user: UserInfo) => {

@@ -170,16 +170,20 @@ export default function ConnectPage() {
 			otherEnd: usernameToCall,
 			caller: user.username,
 		});
+		socket.off("callAccepted");
 		socket.on("callAccepted", () => {
 			startCall();
 			setCallInProgress(true);
 			setRequestInProgress(false);
 			setOtherPersonInCall(usernameToCall);
 		});
+		socket.off("callRejected");
 		socket.on("callRejected", () => {
 			setCallInProgress(false);
 			setRequestInProgress(false);
-			window.alert("Call rejected");
+			window.alert(
+				"Could not connect. Call was rejected/user's media device was not available."
+			);
 		});
 	};
 
