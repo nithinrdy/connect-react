@@ -24,11 +24,11 @@ export default function useFavorites() {
 
 	const removeFavorite = async (userToRemove: string) => {
 		return axiosPrivateService("/api/favorite/remove", {
-			method: "POST",
+			method: "DELETE",
 			headers: {
 				"Content-Type": "application/json",
 			},
-			data: {
+			params: {
 				userToRemove,
 			},
 		})
